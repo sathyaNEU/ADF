@@ -42,202 +42,163 @@
 							{
 								"source": {
 									"name": "Item Number",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Item_Number",
-									"physicalType": "UTF8"
+									"name": "Item_Number"
 								}
 							},
 							{
 								"source": {
 									"name": "Category Name",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Category_Name",
-									"physicalType": "UTF8"
+									"name": "Category_Name"
 								}
 							},
 							{
 								"source": {
 									"name": "Item Description",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Item_Description",
-									"physicalType": "UTF8"
+									"name": "Item_Description"
 								}
 							},
 							{
 								"source": {
 									"name": "Vendor",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "Vendor",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "Vendor Name",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Vendor_Name",
-									"physicalType": "UTF8"
+									"name": "Vendor_Name"
 								}
 							},
 							{
 								"source": {
 									"name": "Bottle Volume (ml)",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Bottle_Volume_ml",
-									"physicalType": "UTF8"
+									"name": "Bottle_Volume_ml"
 								}
 							},
 							{
 								"source": {
 									"name": "Pack",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "Pack",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "Inner Pack",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Inner_Pack",
-									"physicalType": "UTF8"
+									"name": "Inner_Pack"
 								}
 							},
 							{
 								"source": {
 									"name": "Age",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "Age",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "Proof",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "Proof",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "List Date",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "List_Date",
-									"physicalType": "UTF8"
+									"name": "List_Date"
 								}
 							},
 							{
 								"source": {
 									"name": "UPC",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "UPC",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "SCC",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
 									"name": "SCC",
-									"type": "String",
-									"physicalType": "UTF8"
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"name": "State Bottle Cost",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "State_Bottle_Cost",
-									"physicalType": "UTF8"
+									"name": "State_Bottle_Cost"
 								}
 							},
 							{
 								"source": {
 									"name": "State Case Cost",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "State_Case_Cost",
-									"physicalType": "UTF8"
+									"name": "State_Case_Cost"
 								}
 							},
 							{
 								"source": {
 									"name": "State Bottle Retail",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "State_Bottle_Retail",
-									"physicalType": "UTF8"
+									"name": "State_Bottle_Retail"
 								}
 							},
 							{
 								"source": {
 									"name": "Report Date",
-									"type": "String",
-									"physicalType": "String"
+									"type": "String"
 								},
 								"sink": {
-									"name": "Report_Date",
-									"physicalType": "UTF8"
+									"name": "Report_Date"
 								}
 							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
+						]
 					}
 				},
 				"inputs": [
@@ -251,16 +212,6 @@
 								"value": "\t",
 								"type": "Expression"
 							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "spl_parquet",
-						"type": "DatasetReference",
-						"parameters": {
-							"file_name": "Iowa_Liquor_Products.parquet",
-							"file_path": "parquet-fp"
 						}
 					}
 				]

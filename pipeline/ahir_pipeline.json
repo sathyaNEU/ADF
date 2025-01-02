@@ -20,10 +20,6 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"dataset": {
-						"referenceName": "mdinfo_sqlserver_ds",
-						"type": "DatasetReference"
-					},
 					"firstRowOnly": false
 				}
 			},
@@ -69,25 +65,7 @@
 										"type": "DelimitedTextReadSettings"
 									}
 								},
-								"sink": {
-									"type": "SqlServerSink",
-									"preCopyScript": {
-										"value": "@concat(\n    'IF OBJECT_ID(''',\n    item().tgt_schema_name, \n    '.', \n    item().tgt_table_name, \n    ''') IS NOT NULL TRUNCATE TABLE ',\n    item().tgt_schema_name,\n    '.',\n    item().tgt_table_name\n)\n",
-										"type": "Expression"
-									},
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false,
-									"tableOption": "autoCreate"
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
@@ -104,22 +82,6 @@
 										},
 										"file_delim": {
 											"value": "@item().delim",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "local_sqlserver_sink",
-									"type": "DatasetReference",
-									"parameters": {
-										"tgt_schema_name": {
-											"value": "@item().tgt_schema_name",
-											"type": "Expression"
-										},
-										"tgt_table_name": {
-											"value": "@item().tgt_table_name",
 											"type": "Expression"
 										}
 									}

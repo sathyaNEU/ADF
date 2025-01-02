@@ -52,40 +52,8 @@
 									"tableOption": "autoCreate",
 									"disableMetricsCollection": false
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "sakila_parquet",
-									"type": "DatasetReference",
-									"parameters": {
-										"file_name": {
-											"value": "@item().name",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "Migrate_Each_Table",
-									"type": "DatasetReference",
-									"parameters": {
-										"table_name": {
-											"value": "@split(item().name,'.')[0]",
-											"type": "Expression"
-										}
-									}
-								}
-							]
+								"enableStaging": false
+							}
 						}
 					]
 				}
@@ -103,10 +71,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "get_all_sakila_tables",
-						"type": "DatasetReference"
-					},
 					"fieldList": [
 						"childItems"
 					],

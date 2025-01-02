@@ -20,10 +20,6 @@
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
-					"dataset": {
-						"referenceName": "mdinfo_sqlserver_ds",
-						"type": "DatasetReference"
-					},
 					"firstRowOnly": false
 				}
 			},
@@ -58,20 +54,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataset": {
-									"referenceName": "local_sqlserver_sink",
-									"type": "DatasetReference",
-									"parameters": {
-										"tgt_schema_name": {
-											"value": "@item().tgt_schema_name",
-											"type": "Expression"
-										},
-										"tgt_table_name": {
-											"value": "@item().tgt_table_name",
-											"type": "Expression"
-										}
-									}
-								},
 								"fieldList": [
 									"exists"
 								]
@@ -125,15 +107,7 @@
 												"sqlWriterUseTableLock": false,
 												"tableOption": "autoCreate"
 											},
-											"enableStaging": false,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
+											"enableStaging": false
 										},
 										"inputs": [
 											{
@@ -150,22 +124,6 @@
 													},
 													"file_delim": {
 														"value": "@item().delim",
-														"type": "Expression"
-													}
-												}
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "local_sqlserver_sink",
-												"type": "DatasetReference",
-												"parameters": {
-													"tgt_schema_name": {
-														"value": "@item().tgt_schema_name",
-														"type": "Expression"
-													},
-													"tgt_table_name": {
-														"value": "@item().tgt_table_name",
 														"type": "Expression"
 													}
 												}
@@ -243,15 +201,7 @@
 												"writeBehavior": "insert",
 												"sqlWriterUseTableLock": false
 											},
-											"enableStaging": false,
-											"translator": {
-												"type": "TabularTranslator",
-												"typeConversion": true,
-												"typeConversionSettings": {
-													"allowDataTruncation": true,
-													"treatBooleanAsNumber": false
-												}
-											}
+											"enableStaging": false
 										},
 										"inputs": [
 											{
@@ -268,22 +218,6 @@
 													},
 													"file_delim": {
 														"value": "@item().delim",
-														"type": "Expression"
-													}
-												}
-											}
-										],
-										"outputs": [
-											{
-												"referenceName": "local_sqlserver_sink",
-												"type": "DatasetReference",
-												"parameters": {
-													"tgt_schema_name": {
-														"value": "@item().tgt_schema_name",
-														"type": "Expression"
-													},
-													"tgt_table_name": {
-														"value": "@item().tgt_table_name",
 														"type": "Expression"
 													}
 												}
