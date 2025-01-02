@@ -1,0 +1,207 @@
+{
+	"name": "sf_stream_task_demo",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "v_dt",
+								"value": {
+									"value": "@utcnow()",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "v_pipeline_run_id",
+								"value": {
+									"value": "@substring(pipeline().RunId, 0,29 )",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SnowflakeV2Sink",
+						"preCopyScript": "truncate table demo_db.staging.stg_SeattlePetLicenses;",
+						"importSettings": {
+							"type": "SnowflakeImportCopyCommand"
+						}
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "LS_BLB_STG",
+							"type": "LinkedServiceReference"
+						},
+						"path": "staging"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "License Issue Date",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "LICENSE_ISSUE_DATE",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "License Number",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LICENSE_NUMBER",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Animal's Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ANIMAL_S_NAME",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Species",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SPECIES",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Primary Breed",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PRIMARY_BREED",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Secondary Breed",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SECONDARY_BREED",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ZIP Code",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ZIP_CODE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "v_dt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "DI_CREATEDDT",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "v_pipeline_run_id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PIPELINE_RUN_ID",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "spl_csv",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "spl_sf",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Execute_SF_Task",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Copy data1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Snowflake",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "execute task demo_db.edw.spl_task;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-07-20T16:16:51Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

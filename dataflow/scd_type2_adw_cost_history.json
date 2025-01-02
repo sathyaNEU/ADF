@@ -1,0 +1,140 @@
+{
+	"name": "scd_type2_adw_cost_history",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Custom_Delim_DataSet",
+						"type": "DatasetReference"
+					},
+					"name": "AdwCostHistory"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_AZURE_SQL_DAMG7370",
+						"type": "DatasetReference"
+					},
+					"name": "DimAdwCostHistory"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Custom_Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "out",
+					"rejectedDataLinkedService": {
+						"referenceName": "LS_ADLSG2",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn3",
+					"description": "adding audit columns"
+				},
+				{
+					"name": "window1",
+					"description": "apply lead to get the end date"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select6"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     stg_file as string",
+				"}",
+				"source(output(",
+				"          ProductID as integer,",
+				"          ProductName as string,",
+				"          StartDate_Revised as date,",
+				"          StandardCost as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> AdwCostHistory",
+				"source(output(",
+				"          ProductID as integer,",
+				"          ProductName as string,",
+				"          StartDate_Revised as date,",
+				"          StandardCost as double,",
+				"          scd_start as date,",
+				"          scd_end as date,",
+				"          is_active as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> DimAdwCostHistory",
+				"select6 derive(scd_start = StartDate_Revised,",
+				"          scd_end = toDate(\"9999-12-31\"),",
+				"          is_active = 0) ~> derivedColumn3",
+				"derivedColumn3 window(over(ProductID),",
+				"     asc(StartDate_Revised, true),",
+				"     scd_end = lead(scd_start, 1, toDate('9999-12-31'))) ~> window1",
+				"window1 derive(is_active = iif(scd_end==toDate('9999-12-31'), 1, 0)) ~> derivedColumn4",
+				"select5, select4 union(byName: true)~> union1",
+				"AdwCostHistory select(mapColumn(",
+				"          ProductID,",
+				"          ProductName,",
+				"          StartDate_Revised,",
+				"          StandardCost",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"DimAdwCostHistory select(mapColumn(",
+				"          ProductID,",
+				"          ProductName,",
+				"          StartDate_Revised,",
+				"          StandardCost",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"union1 aggregate(groupBy(ProductID,",
+				"          ProductName,",
+				"          StartDate_Revised,",
+				"          StandardCost),",
+				"     First_ProductID = first(ProductID),",
+				"     partitionBy('hash', 1)) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          ProductID,",
+				"          ProductName,",
+				"          StartDate_Revised,",
+				"          StandardCost",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"derivedColumn4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     filePattern:($stg_file),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> out"
+			]
+		}
+	}
+}

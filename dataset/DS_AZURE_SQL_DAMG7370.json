@@ -1,0 +1,26 @@
+{
+	"name": "DS_AZURE_SQL_DAMG7370",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AZURE_SQL_DAMG7370",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tgt_table": {
+				"type": "string",
+				"defaultValue": "adw_cost_history_scd2"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().tgt_table",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

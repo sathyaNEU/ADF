@@ -1,0 +1,9 @@
+{
+	"name": "adf-Spring2024",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5c45cc2e-7150-4719-bb14-15e30fbbbc39",
+		"tenantId": "a8eec281-aaa3-4dae-ac9b-9a398b9215e7"
+	}
+}

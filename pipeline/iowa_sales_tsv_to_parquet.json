@@ -1,0 +1,273 @@
+{
+	"name": "iowa_sales_tsv_to_parquet",
+	"properties": {
+		"activities": [
+			{
+				"name": "conv_iowa_sales_to_parquet",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Item Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Item_Number",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Category Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Category_Name",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Item Description",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Item_Description",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Vendor",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Vendor",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Vendor Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Vendor_Name",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Bottle Volume (ml)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Bottle_Volume_ml",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Pack",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Pack",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Inner Pack",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Inner_Pack",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Age",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Age",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Proof",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Proof",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "List Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "List_Date",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "UPC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "UPC",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "SCC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SCC",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "State Bottle Cost",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "State_Bottle_Cost",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "State Case Cost",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "State_Case_Cost",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "State Bottle Retail",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "State_Bottle_Retail",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Report Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Report_Date",
+									"physicalType": "UTF8"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Custom_Delim_DataSet",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_name": "Iowa_Liquor_Products.tsv",
+							"file_path": "tsv-fp",
+							"file_delim": {
+								"value": "\t",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "spl_parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_name": "Iowa_Liquor_Products.parquet",
+							"file_path": "parquet-fp"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-07-30T01:13:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

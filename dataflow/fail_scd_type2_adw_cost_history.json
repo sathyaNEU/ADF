@@ -1,0 +1,75 @@
+{
+	"name": "fail_scd_type2_adw_cost_history",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Custom_Delim_DataSet",
+						"type": "DatasetReference"
+					},
+					"name": "AdwCostHistory"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_AZURE_SQL_DAMG7370",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SortedData"
+				},
+				{
+					"name": "AuditColumns",
+					"description": "creating audit columns specifc to SCD Type 2"
+				},
+				{
+					"name": "window1",
+					"description": "scd_end logic"
+				},
+				{
+					"name": "derivedColumn1",
+					"description": "is_active logic"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ProductID as integer,",
+				"          ProductName as string,",
+				"          StartDate_Revised as date,",
+				"          StandardCost as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> AdwCostHistory",
+				"AdwCostHistory sort(asc(ProductID, false),",
+				"     asc(StartDate_Revised, false)) ~> SortedData",
+				"SortedData derive(scd_start = StartDate_Revised,",
+				"          scd_end = currentDate(),",
+				"          is_active = 0,",
+				"          scd_version = 0) ~> AuditColumns",
+				"AuditColumns window(over(ProductID),",
+				"     asc(StartDate_Revised, false),",
+				"     scd_end = lead(scd_start, 1, toDate('9999-12-31')\r",
+				")) ~> window1",
+				"window1 derive(is_active = iif(scd_end==toDate('9999-12-31'), 1, 0)) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

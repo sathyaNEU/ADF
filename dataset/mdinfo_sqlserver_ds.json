@@ -1,0 +1,57 @@
+{
+	"name": "mdinfo_sqlserver_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SHIR_SqlServer_LocalHost",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "md_info_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "file_name",
+				"type": "varchar"
+			},
+			{
+				"name": "file_path",
+				"type": "varchar"
+			},
+			{
+				"name": "delim",
+				"type": "varchar"
+			},
+			{
+				"name": "tgt_schema_name",
+				"type": "varchar"
+			},
+			{
+				"name": "tgt_table_name",
+				"type": "varchar"
+			},
+			{
+				"name": "pipeline_name",
+				"type": "varchar"
+			},
+			{
+				"name": "rows_read",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rows_written",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "md_info"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

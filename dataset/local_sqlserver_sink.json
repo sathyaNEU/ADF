@@ -1,0 +1,31 @@
+{
+	"name": "local_sqlserver_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SHIR_SqlServer_LocalHost",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tgt_schema_name": {
+				"type": "string"
+			},
+			"tgt_table_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().tgt_schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tgt_table_name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
