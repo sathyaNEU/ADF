@@ -1,11 +1,11 @@
 {
 	"name": "LS_AzureKeyVault",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://kvt-bsv.vault.azure.net/"
+			"baseUrl": "https://MyKeyVaultForGit.vault.azure.net/"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
