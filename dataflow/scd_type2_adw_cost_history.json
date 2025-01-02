@@ -25,11 +25,7 @@
 						"referenceName": "Custom_Parquet",
 						"type": "DatasetReference"
 					},
-					"name": "out",
-					"rejectedDataLinkedService": {
-						"referenceName": "LS_ADLSG2",
-						"type": "LinkedServiceReference"
-					}
+					"name": "out"
 				}
 			],
 			"transformations": [
@@ -128,12 +124,11 @@
 				"     validateSchema: false,",
 				"     format: 'parquet',",
 				"     filePattern:($stg_file),",
-				"     umask: 0022,",
-				"     preCommands: [],",
-				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> out"
+				"     partitionBy('hash', 1),",
+				"     preCommands: [],",
+				"     postCommands: []) ~> out"
 			]
 		}
 	}

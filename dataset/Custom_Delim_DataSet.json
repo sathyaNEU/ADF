@@ -1,10 +1,6 @@
 {
 	"name": "Custom_Delim_DataSet",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "LS_ADLSG2",
-			"type": "LinkedServiceReference"
-		},
 		"parameters": {
 			"file_name": {
 				"type": "string"

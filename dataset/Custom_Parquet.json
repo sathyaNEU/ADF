@@ -1,10 +1,6 @@
 {
 	"name": "Custom_Parquet",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "LS_ADLSG2",
-			"type": "LinkedServiceReference"
-		},
 		"parameters": {
 			"file_path": {
 				"type": "string"
