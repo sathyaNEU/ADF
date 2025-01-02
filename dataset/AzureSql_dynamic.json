@@ -1,10 +1,6 @@
 {
 	"name": "AzureSql_dynamic",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "LS_AzureSQL",
-			"type": "LinkedServiceReference"
-		},
 		"parameters": {
 			"schema_name": {
 				"type": "string"

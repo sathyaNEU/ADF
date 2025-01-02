@@ -149,10 +149,6 @@
 											"secureInput": false
 										},
 										"userProperties": [],
-										"linkedServiceName": {
-											"referenceName": "SHIR_SqlServer_LocalHost",
-											"type": "LinkedServiceReference"
-										},
 										"typeProperties": {
 											"scripts": [
 												{
@@ -243,10 +239,6 @@
 											"secureInput": false
 										},
 										"userProperties": [],
-										"linkedServiceName": {
-											"referenceName": "SHIR_SqlServer_LocalHost",
-											"type": "LinkedServiceReference"
-										},
 										"typeProperties": {
 											"scripts": [
 												{
