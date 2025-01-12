@@ -1,0 +1,699 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-Spring2024"
+		},
+		"LS_ADLSG2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalakebsv1.dfs.core.windows.net/"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "team06.database.windows.net"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "damg"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "damg7370_user"
+		},
+		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://MyKeyVaultForGit.vault.azure.net/"
+		},
+		"LS_BLB_STG_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'LS_BLB_STG'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/scd_type2_demo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "scd_type2_adw_cost_history",
+								"type": "DataFlowReference",
+								"parameters": {
+									"stg_file": {
+										"value": "'@{concat(pipeline().RunId,'.parquet')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"AdwCostHistory": {
+										"file_name": {
+											"value": "@pipeline().parameters.src_file",
+											"type": "Expression"
+										},
+										"file_path": {
+											"value": "@pipeline().parameters.src_directory",
+											"type": "Expression"
+										},
+										"file_delim": ","
+									},
+									"DimAdwCostHistory": {
+										"tgt_table": {
+											"value": "@pipeline().parameters.tgt_table",
+											"type": "Expression"
+										}
+									},
+									"out": {
+										"file_path": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@concat(pipeline().RunId,'.parquet')",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Data flow1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@{concat('truncate table ',pipeline().parameters.tgt_table)}",
+									"type": "Expression"
+								},
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ProductID",
+										"scd_start",
+										"is_active"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Custom_Parquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_path": "@pipeline().Pipeline",
+									"file_name": "@concat(pipeline().RunId,'.parquet')"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_AZURE_SQL_DAMG7370",
+								"type": "DatasetReference",
+								"parameters": {
+									"tgt_table": {
+										"value": "@pipeline().parameters.tgt_table",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"tgt_table": {
+						"type": "string",
+						"defaultValue": "adw_cost_history_scd2"
+					},
+					"src_file": {
+						"type": "string",
+						"defaultValue": "ADW_ProductCost_History_forSCD.csv"
+					},
+					"src_directory": {
+						"type": "string",
+						"defaultValue": "csv"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-01-02T05:50:06Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/scd_type2_adw_cost_history')]",
+				"[concat(variables('factoryId'), '/datasets/Custom_Parquet')]",
+				"[concat(variables('factoryId'), '/datasets/DS_AZURE_SQL_DAMG7370')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSql_dynamic')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AZURE_SQL_DAMG7370",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schema_name": {
+						"type": "string"
+					},
+					"table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schema_name",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AZURE_SQL_DAMG7370')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Custom_Delim_DataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLSG2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_name": {
+						"type": "string"
+					},
+					"file_path": {
+						"type": "string"
+					},
+					"file_delim": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": {
+						"value": "@dataset().file_delim",
+						"type": "Expression"
+					},
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Date",
+						"type": "String"
+					},
+					{
+						"name": "Open",
+						"type": "String"
+					},
+					{
+						"name": "High",
+						"type": "String"
+					},
+					{
+						"name": "Low",
+						"type": "String"
+					},
+					{
+						"name": "Close",
+						"type": "String"
+					},
+					{
+						"name": "Adj Close",
+						"type": "String"
+					},
+					{
+						"name": "Volume",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLSG2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Custom_Parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLSG2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_path": {
+						"type": "string"
+					},
+					"file_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": "parquet"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLSG2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_AZURE_SQL_DAMG7370')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AZURE_SQL_DAMG7370",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"tgt_table": {
+						"type": "string",
+						"defaultValue": "adw_cost_history_scd2"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().tgt_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AZURE_SQL_DAMG7370')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLSG2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLSG2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_AzureKeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "datalakestgacckey"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AZURE_SQL_DAMG7370')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "SERVER - TEAM06\nDB - DAMG\nUSER - DAMG7370_USER",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_AZURE_SQL_DAMG7370_properties_typeProperties_server')]",
+					"database": "[parameters('LS_AZURE_SQL_DAMG7370_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_AZURE_SQL_DAMG7370_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_AzureKeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "sqlserverpwd"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureKeyVault')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('LS_AzureKeyVault_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_BLB_STG')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"sasUri": "[parameters('LS_BLB_STG_sasUri')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/fail_scd_type2_adw_cost_history')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Custom_Delim_DataSet",
+								"type": "DatasetReference"
+							},
+							"name": "AdwCostHistory"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_AZURE_SQL_DAMG7370",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SortedData"
+						},
+						{
+							"name": "AuditColumns",
+							"description": "creating audit columns specifc to SCD Type 2"
+						},
+						{
+							"name": "window1",
+							"description": "scd_end logic"
+						},
+						{
+							"name": "derivedColumn1",
+							"description": "is_active logic"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          ProductID as integer,",
+						"          ProductName as string,",
+						"          StartDate_Revised as date,",
+						"          StandardCost as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> AdwCostHistory",
+						"AdwCostHistory sort(asc(ProductID, false),",
+						"     asc(StartDate_Revised, false)) ~> SortedData",
+						"SortedData derive(scd_start = StartDate_Revised,",
+						"          scd_end = currentDate(),",
+						"          is_active = 0,",
+						"          scd_version = 0) ~> AuditColumns",
+						"AuditColumns window(over(ProductID),",
+						"     asc(StartDate_Revised, false),",
+						"     scd_end = lead(scd_start, 1, toDate('9999-12-31')\r",
+						")) ~> window1",
+						"window1 derive(is_active = iif(scd_end==toDate('9999-12-31'), 1, 0)) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Custom_Delim_DataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DS_AZURE_SQL_DAMG7370')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scd_type2_adw_cost_history')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Custom_Delim_DataSet",
+								"type": "DatasetReference"
+							},
+							"name": "AdwCostHistory"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_AZURE_SQL_DAMG7370",
+								"type": "DatasetReference"
+							},
+							"name": "DimAdwCostHistory"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Custom_Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "out"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn3",
+							"description": "adding audit columns"
+						},
+						{
+							"name": "window1",
+							"description": "apply lead to get the end date"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "select4"
+						},
+						{
+							"name": "select5"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select6"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     stg_file as string",
+						"}",
+						"source(output(",
+						"          ProductID as integer,",
+						"          ProductName as string,",
+						"          StartDate_Revised as date,",
+						"          StandardCost as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> AdwCostHistory",
+						"source(output(",
+						"          ProductID as integer,",
+						"          ProductName as string,",
+						"          StartDate_Revised as date,",
+						"          StandardCost as double,",
+						"          scd_start as date,",
+						"          scd_end as date,",
+						"          is_active as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DimAdwCostHistory",
+						"select6 derive(scd_start = StartDate_Revised,",
+						"          scd_end = toDate(\"9999-12-31\"),",
+						"          is_active = 0) ~> derivedColumn3",
+						"derivedColumn3 window(over(ProductID),",
+						"     asc(StartDate_Revised, true),",
+						"     scd_end = lead(scd_start, 1, toDate('9999-12-31'))) ~> window1",
+						"window1 derive(is_active = iif(scd_end==toDate('9999-12-31'), 1, 0)) ~> derivedColumn4",
+						"select5, select4 union(byName: true)~> union1",
+						"AdwCostHistory select(mapColumn(",
+						"          ProductID,",
+						"          ProductName,",
+						"          StartDate_Revised,",
+						"          StandardCost",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"DimAdwCostHistory select(mapColumn(",
+						"          ProductID,",
+						"          ProductName,",
+						"          StartDate_Revised,",
+						"          StandardCost",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select5",
+						"union1 aggregate(groupBy(ProductID,",
+						"          ProductName,",
+						"          StartDate_Revised,",
+						"          StandardCost),",
+						"     First_ProductID = first(ProductID),",
+						"     partitionBy('hash', 1)) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          ProductID,",
+						"          ProductName,",
+						"          StartDate_Revised,",
+						"          StandardCost",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select6",
+						"derivedColumn4 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     filePattern:($stg_file),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> out"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Custom_Delim_DataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DS_AZURE_SQL_DAMG7370')]",
+				"[concat(variables('factoryId'), '/datasets/Custom_Parquet')]"
+			]
+		}
+	]
+}

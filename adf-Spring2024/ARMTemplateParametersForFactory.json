@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-Spring2024"
+		},
+		"LS_ADLSG2_properties_typeProperties_url": {
+			"value": "https://datalakebsv1.dfs.core.windows.net/"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_server": {
+			"value": "team06.database.windows.net"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_database": {
+			"value": "damg"
+		},
+		"LS_AZURE_SQL_DAMG7370_properties_typeProperties_userName": {
+			"value": "damg7370_user"
+		},
+		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://MyKeyVaultForGit.vault.azure.net/"
+		},
+		"LS_BLB_STG_sasUri": {
+			"value": ""
+		}
+	}
+}
